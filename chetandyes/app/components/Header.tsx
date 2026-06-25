@@ -16,10 +16,6 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
-
   const isActive = (path: string) => pathname === path;
 
   return (
@@ -98,6 +94,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
                   className={`font-medium px-3 py-2 rounded-lg transition-colors ${
                     isActive(link.href)
                       ? 'text-amber-800 bg-amber-50'
@@ -107,7 +104,7 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
-              <Link href="/contact" className="btn-primary text-center mt-1">
+              <Link href="/contact" className="btn-primary text-center mt-1" onClick={() => setIsMenuOpen(false)}>
                 Contact Us
               </Link>
             </div>

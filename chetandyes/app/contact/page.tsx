@@ -59,7 +59,7 @@ export default function ContactPage() {
               Contact Us
             </h1>
             <p className="text-xl text-stone-600">
-              Get in touch for product inquiries, quotes, or any questions. We're here to help.
+              Get in touch for product inquiries, quotes, or any questions. We&apos;re here to help.
             </p>
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function ContactPage() {
                     <a href="mailto:chetan68india@yahoo.com" className="text-amber-700 hover:underline">
                       chetan68india@yahoo.com
                     </a>
-                    <p className="text-stone-500 text-sm">We'll respond within 24 hours</p>
+                    <p className="text-stone-500 text-sm">We&apos;ll respond within 24 hours</p>
                   </div>
                 </div>
 
@@ -174,7 +174,7 @@ export default function ContactPage() {
                     </div>
                     <h3 className="text-xl font-bold text-stone-900 mb-2">Thank You!</h3>
                     <p className="text-stone-600 mb-6">
-                      Your message has been sent successfully. We'll get back to you shortly.
+                      Your message has been sent successfully. We&apos;ll get back to you shortly.
                     </p>
                     <button
                       onClick={() => {

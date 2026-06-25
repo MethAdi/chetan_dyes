@@ -280,7 +280,7 @@ export default function ProductsPage() {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Need a Quote?</h2>
           <p className="text-stone-300 mb-8 max-w-xl mx-auto">
-            Contact us with your requirements and we'll provide competitive pricing with fast delivery across India.
+            Contact us with your requirements and we&apos;ll provide competitive pricing with fast delivery across India.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact" className="btn-primary bg-amber-700 hover:bg-amber-600">

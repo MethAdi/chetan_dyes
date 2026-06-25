@@ -11,7 +11,7 @@ export default function Footer() {
               Chetan Dyes & Chemical Company
             </h3>
             <p className="text-stone-400 mb-4">
-              Trusted distributor of quality dyes and chemicals serving India's
+              Trusted distributor of quality dyes and chemicals serving India&apos;s
               textile industry for over 50 years.
             </p>
             <p className="text-stone-400 text-sm">
