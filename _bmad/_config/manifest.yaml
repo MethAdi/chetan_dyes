@@ -1,0 +1,15 @@
+installation:
+  version: 6.0.0-alpha.23
+  installDate: 2026-01-28T05:30:30.997Z
+  lastUpdated: 2026-01-28T05:30:30.997Z
+modules:
+  - core
+  - bmm
+ides:
+  - claude-code
+  - codex
+  - cursor
+  - github-copilot
+  - antigravity
+  - opencode
+  - windsurf
