@@ -287,7 +287,7 @@ export default function ProductsPage() {
               Request Quote
             </Link>
             <a
-              href="https://wa.me/91XXXXXXXXXX?text=Hi, I would like to inquire about your dyes."
+              href="https://wa.me/919322405448?text=Hi, I would like to inquire about your dyes."
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary border-stone-600 text-white hover:border-green-500 hover:text-green-400"

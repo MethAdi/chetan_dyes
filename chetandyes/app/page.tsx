@@ -453,7 +453,7 @@ export default function Home() {
                 </svg>
               </Link>
               <a
-                href="tel:+91XXXXXXXXXX"
+                href="tel:+919322405448"
                 className="btn-secondary border-stone-600 text-white hover:border-white hover:text-white"
               >
                 <svg
