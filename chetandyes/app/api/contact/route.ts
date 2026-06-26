@@ -1,8 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 
 export async function POST(req: NextRequest) {
   try {
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Chetan Dyes <onboarding@resend.dev>';
+    const recipientEmail = process.env.RECIPIENT_EMAIL || 'chetan68india@yahoo.com';
+
+    if (!resendApiKey) {
+      console.error('Missing RESEND_API_KEY environment variable.');
+      return NextResponse.json(
+        { error: 'Email is not configured yet. Please contact us directly.' },
+        { status: 500 }
+      );
+    }
+
     const { name, company, email, phone, product, message } = await req.json();
 
     // Validate required fields
@@ -12,16 +31,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Create transporter using Gmail SMTP (or any SMTP service)
-    // For production, use environment variables for credentials
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.SMTP_EMAIL,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
 
     // Product label mapping
     const productLabels: Record<string, string> = {
@@ -35,13 +44,33 @@ export async function POST(req: NextRequest) {
     };
 
     const productLabel = product ? (productLabels[product] || product) : 'Not specified';
+    const safeName = escapeHtml(String(name));
+    const safeCompany = escapeHtml(String(company || 'Not provided'));
+    const safeEmail = escapeHtml(String(email));
+    const safePhone = escapeHtml(String(phone));
+    const safeProductLabel = escapeHtml(String(productLabel));
+    const safeMessage = escapeHtml(String(message));
 
     // Email to the business owner
-    const mailOptions = {
-      from: process.env.SMTP_EMAIL,
-      to: process.env.RECIPIENT_EMAIL || 'chetan68india@yahoo.com',
-      replyTo: email,
+    const emailPayload = {
+      from: resendFromEmail,
+      to: recipientEmail,
+      reply_to: email,
       subject: `New Inquiry from ${name} - Chetan Dyes Website`,
+      text: [
+        'New Contact Form Submission',
+        '',
+        `Name: ${name}`,
+        `Company: ${company || 'Not provided'}`,
+        `Email: ${email}`,
+        `Phone: ${phone}`,
+        `Product Interest: ${productLabel}`,
+        '',
+        'Message:',
+        message,
+        '',
+        'This message was sent from the Chetan Dyes & Chemical Company website contact form.',
+      ].join('\n'),
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #1C1917; border-bottom: 2px solid #B45309; padding-bottom: 10px;">
@@ -51,27 +80,27 @@ export async function POST(req: NextRequest) {
           <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
             <tr>
               <td style="padding: 10px; font-weight: bold; color: #57534E; width: 140px; vertical-align: top;">Name:</td>
-              <td style="padding: 10px; color: #1C1917;">${name}</td>
+              <td style="padding: 10px; color: #1C1917;">${safeName}</td>
             </tr>
             <tr style="background-color: #FAFAF9;">
               <td style="padding: 10px; font-weight: bold; color: #57534E; vertical-align: top;">Company:</td>
-              <td style="padding: 10px; color: #1C1917;">${company || 'Not provided'}</td>
+              <td style="padding: 10px; color: #1C1917;">${safeCompany}</td>
             </tr>
             <tr>
               <td style="padding: 10px; font-weight: bold; color: #57534E; vertical-align: top;">Email:</td>
-              <td style="padding: 10px; color: #1C1917;"><a href="mailto:${email}">${email}</a></td>
+              <td style="padding: 10px; color: #1C1917;"><a href="mailto:${safeEmail}">${safeEmail}</a></td>
             </tr>
             <tr style="background-color: #FAFAF9;">
               <td style="padding: 10px; font-weight: bold; color: #57534E; vertical-align: top;">Phone:</td>
-              <td style="padding: 10px; color: #1C1917;"><a href="tel:${phone}">${phone}</a></td>
+              <td style="padding: 10px; color: #1C1917;"><a href="tel:${safePhone}">${safePhone}</a></td>
             </tr>
             <tr>
               <td style="padding: 10px; font-weight: bold; color: #57534E; vertical-align: top;">Product Interest:</td>
-              <td style="padding: 10px; color: #1C1917;">${productLabel}</td>
+              <td style="padding: 10px; color: #1C1917;">${safeProductLabel}</td>
             </tr>
             <tr style="background-color: #FAFAF9;">
               <td style="padding: 10px; font-weight: bold; color: #57534E; vertical-align: top;">Message:</td>
-              <td style="padding: 10px; color: #1C1917; white-space: pre-wrap;">${message}</td>
+              <td style="padding: 10px; color: #1C1917; white-space: pre-wrap;">${safeMessage}</td>
             </tr>
           </table>
           
@@ -82,7 +111,23 @@ export async function POST(req: NextRequest) {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    const resendResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(emailPayload),
+    });
+
+    if (!resendResponse.ok) {
+      const resendError = await resendResponse.text();
+      console.error('Resend email error:', resendError);
+      return NextResponse.json(
+        { error: 'Failed to send message. Please try again or contact us directly.' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true, message: 'Email sent successfully' });
   } catch (error) {
